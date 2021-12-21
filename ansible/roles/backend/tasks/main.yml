@@ -1,0 +1,59 @@
+- name: Configure nginx site
+  template:
+    src: ./templates/nginx.conf.j2
+    dest: /etc/nginx/sites-available/site.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  notify: reload nginx
+  tags:
+    - nginx
+
+- name: Enable nginx site as default
+  file:
+    src: /etc/nginx/sites-available/site.conf
+    dest: /etc/nginx/sites-enabled/default
+    state: link
+  become: true
+  notify: reload nginx
+  tags:
+    - nginx
+
+- name: Copy source code
+  synchronize:
+    src: "{{ src }}"
+    dest: "{{ workdir }}"
+  become: true
+  tags:
+    - deploy
+
+- name: Copy supervisor configuration
+  template:
+    src: ./templates/supervisor.conf.j2
+    dest: /etc/supervisor/conf.d/supervisor.conf
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  notify: reload supervisor
+  tags:
+    - deploy
+
+- name: Ensure Python dependencies are installed
+  pip:
+    chdir: "{{ workdir }}"
+    requirements: requirements.txt
+    virtualenv: venv
+    virtualenv_command: "{{ python_executable }} -m venv"
+    state: present
+  become: true
+  tags:
+    - deploy
+
+- name: Ensure application is running
+  supervisorctl: name={{ backend_prog_name }} state=present
+  become: true
+  notify: reload nginx
+  tags:
+    - deploy

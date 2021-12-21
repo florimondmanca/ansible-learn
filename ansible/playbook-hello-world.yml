@@ -1,0 +1,10 @@
+---
+- name: Hello world playbook
+  hosts: all
+  tasks:
+    - name: Saying hello
+      command: "echo 'Hello, world!'"
+      register: hello_result
+    - name: debug
+      debug:
+        var: hello_result.stdout_lines

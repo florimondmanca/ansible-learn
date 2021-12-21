@@ -1,0 +1,34 @@
+- name: Update system
+  apt: update_cache=yes
+  become: true
+
+- name: Ensure workdir exists
+  file:
+    path: "{{ workdir }}"
+    state: directory
+    mode: 0755
+  become: true
+
+- name: Ensure nginx is the latest version
+  apt: name=nginx state=latest
+  become: true
+  tags:
+    - nginx
+
+- name: Start nginx
+  service: name=nginx state=started
+  become: true
+  tags:
+    - nginx
+
+- name: Ensure supervisor is installed
+  apt: name=supervisor state=present
+  become: true
+  tags:
+    - supervisor
+
+- name: Ensure supervisor is running
+  service: name=supervisor state=started enabled=yes
+  become: true
+  tags:
+    - supervisor

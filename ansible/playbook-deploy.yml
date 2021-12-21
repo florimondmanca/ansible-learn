@@ -1,0 +1,17 @@
+---
+- hosts: all
+
+  vars:
+    src: "../backend/"
+    workdir: "/var/www/app"
+    python_version: "3.10"
+    python_executable: "python{{ python_version }}"
+    backend_prog_name: app
+    backend_unix_socket: "{{ workdir }}/unix.sock"
+    backend_app: app:app
+    backend_workers: 2
+
+  roles:
+    - common
+    - python
+    - backend

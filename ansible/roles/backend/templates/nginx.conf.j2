@@ -1,0 +1,15 @@
+server {
+    listen 80;
+    server_name {{ inventory_hostname }};
+
+    location /favicon.ico {
+        access_log off;
+        log_not_found off;
+    }
+
+    location / {
+            include proxy_params;
+            proxy_pass http://unix:{{ backend_unix_socket }};
+    }
+}
+

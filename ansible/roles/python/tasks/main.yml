@@ -1,0 +1,20 @@
+- name: Ensure software-properties-common is present
+  apt: name=software-properties-common state=present
+  become: true
+  tags:
+    - python
+
+- name: Add deadsnakes repo
+  apt_repository: repo="ppa:deadsnakes/ppa"
+  become: true
+  tags:
+    - python
+
+- name: Ensure Python is installed
+  apt: name={{ item }} state=present
+  become: true
+  with_items:
+    - "python{{ python_version }}-dev"
+    - "python{{ python_version }}-venv"
+  tags:
+    - python
